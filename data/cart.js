@@ -15,6 +15,11 @@ function saveToStorage() {
   localStorage.setItem("cart", JSON.stringify(cart));
 }
 
+export function getCart() {
+  // Return a deep copy to prevent external modification
+  return JSON.parse(JSON.stringify(cart));
+}
+
 export function addToCart(productId, quantity) {
   let matchingItem;
   cart.forEach((item) => {
@@ -81,5 +86,10 @@ export function updateDeliveryOption(productId, deliveryOptionId) {
 
   matchingItem.deliveryOptionId = deliveryOptionId;
 
+  saveToStorage();
+}
+
+export function resetCart() {
+  cart = [];
   saveToStorage();
 }

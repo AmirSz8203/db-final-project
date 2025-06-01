@@ -31,15 +31,20 @@ function isWeekend(date) {
   return dayOfWeek === "Saturday" || dayOfWeek === "Sunday";
 }
 
-export function calculateDeliveryDate(deliveryOption) {
+export function calculateDeliveryDate(deliveryOption, startDate) {
   let remainingDays = deliveryOption.deliveryDays;
-  let deliveryDate = dayjs().subtract(4, "day");
+  let deliveryDate = startDate ? dayjs(startDate) : dayjs();
 
-  while (remainingDays > 0) {
-    deliveryDate = deliveryDate.add(1, "day");
-
-    if (!isWeekend(deliveryDate)) {
-      remainingDays--;
+  if (deliveryOption.deliveryDays === 0) {
+    while (isWeekend(deliveryDate)) {
+      deliveryDate = deliveryDate.add(1, "day");
+    }
+  } else {
+    while (remainingDays > 0) {
+      deliveryDate = deliveryDate.add(1, "day");
+      if (!isWeekend(deliveryDate)) {
+        remainingDays--;
+      }
     }
   }
 
