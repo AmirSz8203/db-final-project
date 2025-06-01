@@ -15,8 +15,30 @@ export function renderPaymentSummary() {
   }
 
   currentCart.forEach((cartItem) => {
-    const product = getProduct(cartItem.productId);
-    productPriceCents += product.priceCents * cartItem.quantity;
+    // const product = getProduct(cartItem.productId); // We no longer need full product details here for price
+    // productPriceCents += product.priceCents * cartItem.quantity;
+
+    // Use the price stored in the cart item itself
+    if (cartItem.priceWhenAddedCents !== undefined) {
+      productPriceCents += cartItem.priceWhenAddedCents * cartItem.quantity;
+    } else {
+      // Fallback or error handling if priceWhenAddedCents is missing
+      // This might happen for carts stored before this change, though initializeCartWithPrices should handle it.
+      console.warn(
+        "Cart item missing priceWhenAddedCents, attempting fallback:",
+        cartItem
+      );
+      const productInfo = getProduct(cartItem.productId);
+      if (productInfo) {
+        productPriceCents +=
+          productInfo.effectivePriceCents * cartItem.quantity;
+      } else {
+        console.error(
+          "Cannot calculate price for cart item, product not found:",
+          cartItem.productId
+        );
+      }
+    }
 
     const deliveryOption = getDeliveryOption(cartItem.deliveryOptionId);
     shippingPriceCents += deliveryOption.priceCents;

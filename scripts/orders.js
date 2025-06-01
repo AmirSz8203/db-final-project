@@ -94,6 +94,12 @@ function renderOrdersPage() {
         );
       }
 
+      // If product details are available, use them. Price should come from item.priceWhenAddedCents.
+      const displayPrice =
+        item.priceWhenAddedCents !== undefined
+          ? item.priceWhenAddedCents
+          : product.effectivePriceCents || product.priceCents; // Fallback if somehow not on item
+
       ordersHTML += `
         <div class="product-image-container">
           <img src="${product.image}">
@@ -102,13 +108,18 @@ function renderOrdersPage() {
           <div class="product-name">
             ${product.name}
           </div>
+          <div class="product-price">
+            $${formatCurrency(displayPrice)} <!-- Display price paid -->
+          </div>
           <div class="product-delivery-date">
             Arriving on: ${deliveryDateString}
           </div>
           <div class="product-quantity">
             Quantity: ${item.quantity}
           </div>
-          <button class="buy-again-button button-primary js-buy-again" data-product-id="${product.id}">
+          <button class="buy-again-button button-primary js-buy-again" data-product-id="${
+            product.id
+          }">
             <img class="buy-again-icon" src="images/icons/buy-again.png">
             <span class="buy-again-message">Buy it again</span>
           </button>

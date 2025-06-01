@@ -6,7 +6,26 @@ export function getProduct(productId) {
       matchingProduct = product;
     }
   });
-  return matchingProduct;
+
+  if (matchingProduct) {
+    let effectivePriceCents = matchingProduct.priceCents;
+    if (
+      matchingProduct.discountPercent &&
+      matchingProduct.discountPercent > 0
+    ) {
+      const discountAmount = Math.round(
+        matchingProduct.priceCents * (matchingProduct.discountPercent / 100)
+      );
+      effectivePriceCents = matchingProduct.priceCents - discountAmount;
+    }
+    // Return a new object with the original product data and the effective price
+    return {
+      ...matchingProduct,
+      effectivePriceCents: effectivePriceCents,
+    };
+  }
+
+  return undefined; // Or null, if product not found
 }
 
 export const products = [
@@ -20,6 +39,7 @@ export const products = [
     },
     priceCents: 2670,
     keywords: ["socks", "sports", "apparel"],
+    discountPercent: 10,
   },
   {
     id: "id2",
@@ -53,6 +73,7 @@ export const products = [
     },
     priceCents: 2095,
     keywords: ["sports", "basketballs"],
+    discountPercent: 5,
   },
   {
     id: "83d4ca15-0f35-48f5-b7a3-1ea210004f2e",

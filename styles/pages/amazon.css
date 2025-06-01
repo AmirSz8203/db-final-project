@@ -76,6 +76,8 @@
 
   display: flex;
   flex-direction: column;
+
+  position: relative; /* Needed for absolute positioning of the badge */
 }
 
 .product-image-container {
@@ -157,4 +159,34 @@
 
 .added-to-cart-visible {
   opacity: 1;
+}
+
+/* Styles for discount display */
+.discount-badge {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  background-color: rgb(200, 0, 0);
+  color: white;
+  padding: 4px 8px;
+  font-size: 12px;
+  font-weight: bold;
+  border-radius: 4px;
+  z-index: 1; /* Ensure it's above the image if they overlap */
+}
+
+.product-price-original {
+  font-size: 0.9em;
+  color: grey;
+  margin-bottom: 2px; /* Small space before discounted price */
+}
+
+.product-price-original s {
+  text-decoration: line-through;
+}
+
+.product-price-discounted {
+  font-weight: 700;
+  color: rgb(200, 0, 0); /* Make discounted price stand out */
+  margin-bottom: 10px;
 }

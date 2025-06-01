@@ -18,20 +18,33 @@ import { renderCheckoutHeader } from "./checkoutHeader.js";
 
 export function renderOrderSummary() {
   let cartSummaryHTML = "";
+  const currentCart = cart; // Use the imported cart which should now have priceWhenAddedCents
 
-  cart.forEach((cartItem) => {
+  currentCart.forEach((cartItem) => {
     const productId = cartItem.productId;
-    const matchingProduct = getProduct(productId);
+    // getProduct now returns effectivePriceCents but we should rely on cartItem.priceWhenAddedCents for consistency
+    const matchingProductInfo = getProduct(productId);
+
+    if (!matchingProductInfo) {
+      console.error(
+        `Product info not found for ID: ${productId} in renderOrderSummary`
+      );
+      return; // Skip this item if basic product info is missing
+    }
 
     const deliveryOptionId = cartItem.deliveryOptionId;
-
     const deliveryOption = getDeliveryOption(deliveryOptionId);
-
     const dateString = calculateDeliveryDate(deliveryOption);
+
+    // Use cartItem.priceWhenAddedCents for display
+    const itemPriceForDisplay =
+      cartItem.priceWhenAddedCents !== undefined
+        ? cartItem.priceWhenAddedCents
+        : matchingProductInfo.effectivePriceCents; // Fallback if somehow not set, though it should be
 
     cartSummaryHTML += `
       <div class="cart-item-container 
-      js-cart-item-container-${matchingProduct.id}">
+      js-cart-item-container-${matchingProductInfo.id}">
         <div class="delivery-date">
         Delivery date: ${dateString}
         </div>
@@ -39,35 +52,37 @@ export function renderOrderSummary() {
         <div class="cart-item-details-grid">
           <img
             class="product-image"
-            src="${matchingProduct.image}"
+            src="${matchingProductInfo.image}"
           />
   
           <div class="cart-item-details">
             <div class="product-name">
-              ${matchingProduct.name}
+              ${matchingProductInfo.name}
             </div>
             <div class="product-price">
-              $${formatCurrency(matchingProduct.priceCents)}
+              $${formatCurrency(itemPriceForDisplay)}
             </div>
             <div class="product-quantity">
               <span>
                 Quantity: <span
-                class="quantity-label js-quantity-label-${matchingProduct.id}">
+                class="quantity-label js-quantity-label-${
+                  matchingProductInfo.id
+                }">
                 ${cartItem.quantity}
               </span>
               </span>
               <span class="update-quantity-link link-primary 
-                js-update-link" data-product-id="${matchingProduct.id}">
+                js-update-link" data-product-id="${matchingProductInfo.id}">
                 Update
               </span>
               <input class="quantity-input 
-              js-quantity-input-${matchingProduct.id}">
+              js-quantity-input-${matchingProductInfo.id}">
               <span class="save-quantity-link link-primary 
-                js-save-link" data-product-id="${matchingProduct.id}">
+                js-save-link" data-product-id="${matchingProductInfo.id}">
                 Save
               </span>
               <span class="delete-quantity-link link-primary 
-                js-delete-link" data-product-id="${matchingProduct.id}">
+                js-delete-link" data-product-id="${matchingProductInfo.id}">
                 Delete
               </span>
             </div>
@@ -75,7 +90,7 @@ export function renderOrderSummary() {
   
           <div class="delivery-options">
             <div class="delivery-options-title">Choose a delivery option:</div> 
-            ${deliveryOptionsHTML(matchingProduct, cartItem)}      
+            ${deliveryOptionsHTML(matchingProductInfo, cartItem)}      
           </div>
         </div>
       </div>

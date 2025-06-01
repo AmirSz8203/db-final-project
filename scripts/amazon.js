@@ -1,98 +1,189 @@
 import { cart, addToCart, calculateCartQuantity } from "../data/cart.js";
 import { products } from "../data/products.js";
 
-let productsHTML = "";
-products.forEach((product) => {
-  productsHTML += `
-    <div class="product-container">
-      <div class="product-image-container">
-        <img
-          class="product-image"
-          src="./${product.image}"
-        />
-      </div>
+const productsGridElement = document.querySelector(".js-products-grid");
+const searchBarElement = document.querySelector(".search-bar");
+const searchButtonElement = document.querySelector(".search-button");
 
-      <div class="product-name limit-text-to-2-lines">
-        ${product.name}
-      </div>
+function renderProductsGrid(productsToDisplay) {
+  let productsHTML = "";
+  if (productsToDisplay.length === 0) {
+    productsHTML =
+      '<p class="no-products-found">No products match your search.</p>';
+  } else {
+    productsToDisplay.forEach((product) => {
+      let priceHTML = "";
+      let discountBadgeHTML = "";
+      // currentPriceCents is not strictly needed here anymore if addToCart uses getProduct from products.js for price
 
-      <div class="product-rating-container">
-        <img
-          class="product-rating-stars"
-          src="images/ratings/rating-${product.rating.stars * 10}.png"
-        />
-        <div class="product-rating-count link-primary">
-          ${product.rating.count}
+      if (product.discountPercent && product.discountPercent > 0) {
+        const discountAmount = Math.round(
+          product.priceCents * (product.discountPercent / 100)
+        );
+        const discountedPriceCents = product.priceCents - discountAmount;
+
+        priceHTML = `
+          <div class="product-price-original">
+            <s>$${(product.priceCents / 100).toFixed(2)}</s>
+          </div>
+          <div class="product-price-discounted">
+            $${(discountedPriceCents / 100).toFixed(2)}
+          </div>
+        `;
+        discountBadgeHTML = `<div class="discount-badge">${product.discountPercent}% off</div>`;
+      } else {
+        priceHTML = `
+          <div class="product-price">
+            $${(product.priceCents / 100).toFixed(2)}
+          </div>
+        `;
+      }
+
+      productsHTML += `
+        <div class="product-container">
+          ${discountBadgeHTML}
+          <div class="product-image-container">
+            <img class="product-image" src="./${product.image}" />
+          </div>
+          <div class="product-name limit-text-to-2-lines">${product.name}</div>
+          <div class="product-rating-container">
+            <img class="product-rating-stars" src="images/ratings/rating-${
+              product.rating.stars * 10
+            }.png" />
+            <div class="product-rating-count link-primary">${
+              product.rating.count
+            }</div>
+          </div>
+          ${priceHTML}
+          <div class="product-quantity-container">
+            <select class="js-quantity-selector-${product.id}">
+              <option selected value="1">1</option>
+              <option value="2">2</option>
+              <option value="3">3</option>
+              <option value="4">4</option>
+              <option value="5">5</option>
+              <option value="6">6</option>
+              <option value="7">7</option>
+              <option value="8">8</option>
+              <option value="9">9</option>
+              <option value="10">10</option>
+            </select>
+          </div>
+          <div class="product-spacer"></div>
+          <div class="added-to-cart js-added-to-cart-${product.id}">
+            <img src="images/icons/checkmark.png" />
+            Added
+          </div>
+          <button class="add-to-cart-button button-primary js-add-to-cart" data-product-id="${
+            product.id
+          }">
+            Add to Cart
+          </button>
         </div>
-      </div>
-
-      <div class="product-price">
-        $${(product.priceCents / 100).toFixed(2)}
-      </div>
-
-      <div class="product-quantity-container">
-        <select class="js-quantity-selector-${product.id}">
-          <option selected value="1">1</option>
-          <option value="2">2</option>
-          <option value="3">3</option>
-          <option value="4">4</option>
-          <option value="5">5</option>
-          <option value="6">6</option>
-          <option value="7">7</option>
-          <option value="8">8</option>
-          <option value="9">9</option>
-          <option value="10">10</option>
-        </select>
-      </div>
-
-      <div class="product-spacer"></div>
-
-      <div class="added-to-cart js-added-to-cart-${product.id}">
-        <img src="images/icons/checkmark.png" />
-        Added
-      </div>
-
-      <button class="add-to-cart-button 
-			button-primary js-add-to-cart"
-			data-product-id = "${product.id}" >
-        Add to Cart
-      </button>
-    </div>
-  `;
-});
-
-document.querySelector(".js-products-grid").innerHTML = productsHTML;
-
-function updateCartQuantity() {
-  const cartQuantity = calculateCartQuantity();
-  document.querySelector(".js-cart-quantity").innerHTML = cartQuantity;
+      `;
+    });
+  }
+  productsGridElement.innerHTML = productsHTML;
+  // Re-attach event listeners for dynamically created add-to-cart buttons
+  attachAddToCartListeners();
 }
 
-document.querySelectorAll(".js-add-to-cart").forEach((button) => {
-  let addedMessageTimeoutId;
-  button.addEventListener("click", () => {
-    const { productId } = button.dataset;
-    const quantitySelector = document.querySelector(
-      `.js-quantity-selector-${productId}`
-    );
-    const quantity = Number(quantitySelector.value);
-    addToCart(productId, quantity);
-    updateCartQuantity();
+function updateCartQuantityDisplay() {
+  const cartQuantity = calculateCartQuantity();
+  const cartQuantityElement = document.querySelector(".js-cart-quantity");
+  if (cartQuantityElement) {
+    // Check if element exists (it might not on all pages)
+    cartQuantityElement.innerHTML = cartQuantity > 0 ? cartQuantity : 0;
+  }
+}
 
-    const addedMessage = document.querySelector(
-      `.js-added-to-cart-${productId}`
-    );
-    addedMessage.classList.add("added-to-cart-visible");
+// Function to attach listeners to all .js-add-to-cart buttons
+function attachAddToCartListeners() {
+  document.querySelectorAll(".js-add-to-cart").forEach((button) => {
+    // To prevent adding multiple listeners to the same button if this function is called multiple times,
+    // we can either remove old listeners or use a flag. A simpler way for now is to rely on the fact that
+    // innerHTML replacement clears old listeners on the child elements.
+    // However, if buttons are not re-rendered but only their container, this might be an issue.
+    // For full re-render of productsHTML, this is fine.
+    let addedMessageTimeoutId; // This needs to be managed per button, ideally store on the element or a map.
+    // For simplicity, this shared var will cause minor glitches if multiple buttons clicked fast.
 
-    if (addedMessageTimeoutId) {
-      clearTimeout(addedMessageTimeoutId);
-    }
-    const timeoutId = setTimeout(() => {
-      addedMessage.classList.remove("added-to-cart-visible");
-    }, 2000);
+    button.addEventListener("click", () => {
+      const { productId } = button.dataset;
+      const quantitySelector = document.querySelector(
+        `.js-quantity-selector-${productId}`
+      );
+      const quantity = Number(quantitySelector.value);
+      addToCart(productId, quantity); // addToCart now handles getting the correct price
+      updateCartQuantityDisplay();
 
-    addedMessageTimeoutId = timeoutId;
+      const addedMessage = document.querySelector(
+        `.js-added-to-cart-${productId}`
+      );
+      if (addedMessage) {
+        addedMessage.classList.add("added-to-cart-visible");
+
+        // Clear previous timeout for this specific message if one exists
+        // This simple timeout management might still not be perfect for rapidly clicked different buttons.
+        const existingTimeoutId = Number(addedMessage.dataset.timeoutId);
+        if (existingTimeoutId) {
+          clearTimeout(existingTimeoutId);
+        }
+        const timeoutId = setTimeout(() => {
+          addedMessage.classList.remove("added-to-cart-visible");
+          delete addedMessage.dataset.timeoutId;
+        }, 2000);
+        addedMessage.dataset.timeoutId = timeoutId.toString();
+      }
+    });
   });
-});
+}
 
-updateCartQuantity();
+function performSearch() {
+  const searchTerm = searchBarElement.value.trim().toLowerCase();
+  if (searchTerm === "") {
+    renderProductsGrid(products); // Show all if search is empty
+  } else {
+    const filteredProducts = products.filter((product) => {
+      const nameMatch = product.name.toLowerCase().includes(searchTerm);
+      const keywordMatch = product.keywords.some((keyword) =>
+        keyword.toLowerCase().includes(searchTerm)
+      );
+      return nameMatch || keywordMatch;
+    });
+    renderProductsGrid(filteredProducts);
+  }
+}
+
+// Initial setup
+if (productsGridElement) {
+  renderProductsGrid(products); // Initial render of all products
+} else {
+  console.warn(
+    ".js-products-grid not found on this page. Skipping product rendering."
+  );
+}
+
+if (searchButtonElement) {
+  searchButtonElement.addEventListener("click", performSearch);
+} else {
+  console.warn(
+    ".search-button not found on this page. Search will not work via button."
+  );
+}
+
+if (searchBarElement) {
+  searchBarElement.addEventListener("keyup", (event) => {
+    if (event.key === "Enter") {
+      performSearch();
+    }
+  });
+  // Optional: search as user types
+  // searchBarElement.addEventListener("input", performSearch);
+} else {
+  console.warn(
+    ".search-bar not found on this page. Search will not work via input."
+  );
+}
+
+updateCartQuantityDisplay();
