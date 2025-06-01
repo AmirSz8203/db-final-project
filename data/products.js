@@ -1,4 +1,5 @@
 export function getProduct(productId) {
+  console.log("[getProduct] Called with productId:", productId);
   let matchingProduct;
 
   products.forEach((product) => {
