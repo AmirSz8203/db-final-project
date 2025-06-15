@@ -153,9 +153,9 @@ function renderTrackingPage() {
     productQuantityEl.textContent = `Quantity: ${currentItem.quantity}`;
   if (productImageEl) productImageEl.src = productDetails.image;
 
-  // Simplified Progress Bar Logic (No UTC, No Shipped status for now)
+  // Progress Bar Logic (Preparing, Shipped, Delivered)
   const preparingLabel = document.getElementById("js-progress-preparing");
-  const shippedLabel = document.getElementById("js-progress-shipped"); // Will be unused for now
+  const shippedLabel = document.getElementById("js-progress-shipped");
   const deliveredLabel = document.getElementById("js-progress-delivered");
   const progressBar = document.getElementById("js-progress-bar");
 
@@ -164,34 +164,50 @@ function renderTrackingPage() {
   if (shippedLabel) shippedLabel.classList.remove("current-status");
   if (deliveredLabel) deliveredLabel.classList.remove("current-status");
 
-  let status = "Preparing";
-  let progressPercent = 20; // Default
+  let status = "Preparing"; // Default status
+  let progressPercent = 20; // Default progress
 
-  if (estimatedDeliveryDate && estimatedDeliveryDate.isValid()) {
-    const now = dayjs().startOf("day"); // Compare start of current day with start of delivery day
-    const deliveryDay = estimatedDeliveryDate.startOf("day");
+  // Ensure deliveryOption is available (it should be due to early exit if not found)
+  if (
+    estimatedDeliveryDate &&
+    estimatedDeliveryDate.isValid() &&
+    deliveryOption
+  ) {
+    const now = dayjs().startOf("day");
+    const orderDay = dayjs(currentOrder.orderTime).startOf("day");
+    // estimatedDeliveryDate is already effectively startOf('day') as it's parsed from YYYY-MM-DD
+    const deliveryDay = estimatedDeliveryDate;
+    const deliveryDaysDuration = deliveryOption.deliveryDays;
 
-    if (now.isAfter(deliveryDay) || now.isSame(deliveryDay)) {
+    if (now.isSameOrAfter(deliveryDay)) {
       status = "Delivered";
       progressPercent = 100;
       if (deliveredLabel) deliveredLabel.classList.add("current-status");
     } else {
-      status = "Preparing";
-      progressPercent = 20;
-      if (preparingLabel) preparingLabel.classList.add("current-status");
+      // Not yet delivered. Check for Shipped or Preparing.
+      const shippedThresholdDate = orderDay.add(1, "day");
+
+      if (deliveryDaysDuration > 1 && now.isSameOrAfter(shippedThresholdDate)) {
+        status = "Shipped";
+        progressPercent = 60;
+        if (shippedLabel) shippedLabel.classList.add("current-status");
+      } else {
+        status = "Preparing";
+        // progressPercent remains 20 from default
+        if (preparingLabel) preparingLabel.classList.add("current-status");
+      }
     }
   } else {
-    // If no valid estimated delivery date, default to preparing
-    status = "Preparing";
-    progressPercent = 20;
+    // Fallback if delivery date or option is invalid/missing
+    // status and progressPercent remain at their default "Preparing", 20%
     if (preparingLabel) preparingLabel.classList.add("current-status");
     console.warn(
-      "[TrackingPage] No valid estimated delivery date for progress calculation."
+      "[TrackingPage] Invalid data for progress calculation (estimatedDeliveryDate or deliveryOption)."
     );
   }
 
   console.log(
-    `[TrackingPage] Final Simplified Status: ${status} (${progressPercent}%)`
+    `[TrackingPage] Progress Status: ${status} (${progressPercent}%)`
   );
   if (progressBar) progressBar.style.width = `${progressPercent}%`;
 
