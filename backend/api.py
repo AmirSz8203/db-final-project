@@ -1,6 +1,7 @@
 # backend/api.py
 
 from fastapi import FastAPI, Depends, HTTPException, status
+from fastapi.middleware.cors import CORSMiddleware
 from fastapi.security import OAuth2PasswordBearer, OAuth2PasswordRequestForm
 from fastapi.staticfiles import StaticFiles
 from pydantic import BaseModel, ConfigDict
@@ -20,6 +21,21 @@ ACCESS_TOKEN_EXPIRE_MINUTES = 30
 
 # --- FastAPI App Initialization ---
 app = FastAPI()
+
+origins = [
+    "http://127.0.0.1:5501",
+    "http://localhost:5501",
+    "null",
+]
+
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=origins,
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
+
 app.mount("/images", StaticFiles(directory=IM_DIR), name="images")
 
 # --- Password Hashing ---
