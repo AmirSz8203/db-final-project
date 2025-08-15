@@ -67,6 +67,7 @@
     <script type="module" src="./scripts/amazon.js"></script>
     <script>
       document.addEventListener('DOMContentLoaded', async () => {
+        const API_BASE_URL = 'http://localhost:8000';
         const token = localStorage.getItem('accessToken');
         const authLink = document.getElementById('auth-link');
         const authLine1 = document.getElementById('auth-line1');
@@ -74,7 +75,7 @@
 
         if (token) {
           try {
-            const response = await fetch('/users/me', {
+            const response = await fetch(`${API_BASE_URL}/users/me`, {
               headers: { 'Authorization': `Bearer ${token}` }
             });
 

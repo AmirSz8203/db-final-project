@@ -1,6 +1,7 @@
 import { cart, addToCart, calculateCartQuantity } from "../data/cart.js";
 
 let products = [];
+const API_BASE_URL = 'http://localhost:8000';
 
 const productsGridElement = document.querySelector(".js-products-grid");
 const searchBarElement = document.querySelector(".search-bar");
@@ -8,7 +9,7 @@ const searchButtonElement = document.querySelector(".search-button");
 
 async function fetchProducts() {
   try {
-    const response = await fetch('/products');
+    const response = await fetch(`${API_BASE_URL}/products`);
     if (!response.ok) {
       throw new Error(`HTTP error! status: ${response.status}`);
     }
