@@ -1,9 +1,27 @@
 import { cart, addToCart, calculateCartQuantity } from "../data/cart.js";
-import { products } from "../data/products.js";
+
+let products = [];
 
 const productsGridElement = document.querySelector(".js-products-grid");
 const searchBarElement = document.querySelector(".search-bar");
 const searchButtonElement = document.querySelector(".search-button");
+
+async function fetchProducts() {
+  try {
+    const response = await fetch('/products');
+    if (!response.ok) {
+      throw new Error(`HTTP error! status: ${response.status}`);
+    }
+    products = await response.json();
+    renderProductsGrid(products);
+  } catch (error) {
+    console.error("Could not fetch products:", error);
+    const productsGridElement = document.querySelector(".js-products-grid");
+    if (productsGridElement) {
+      productsGridElement.innerHTML = '<p class="error-message">Could not load products. Please try again later.</p>';
+    }
+  }
+}
 
 function renderProductsGrid(productsToDisplay) {
   let productsHTML = "";
@@ -157,7 +175,7 @@ function performSearch() {
 
 // Initial setup
 if (productsGridElement) {
-  renderProductsGrid(products); // Initial render of all products
+  fetchProducts(); // Fetch products from backend and then render
 } else {
   console.warn(
     ".js-products-grid not found on this page. Skipping product rendering."

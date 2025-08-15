@@ -179,6 +179,14 @@
       </div>
     </div>
 
+    <script>
+      document.addEventListener('DOMContentLoaded', () => {
+        const token = localStorage.getItem('accessToken');
+        if (!token) {
+          window.location.href = 'login.html';
+        }
+      });
+    </script>
     <script type="module" src="./scripts/orders.js"></script>
   </body>
 </html>
