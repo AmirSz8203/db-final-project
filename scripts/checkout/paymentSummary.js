@@ -104,7 +104,7 @@ export function renderPaymentSummary() {
       "Attaching click listener to place order button.",
       placeOrderButton
     );
-    placeOrderButton.addEventListener("click", () => {
+    placeOrderButton.addEventListener("click", async () => {
       console.log("Place order button clicked.");
       console.log("Current cart for order:", currentCart);
       if (currentCart.length === 0) {
@@ -112,18 +112,23 @@ export function renderPaymentSummary() {
         alert("Your cart is empty. Please add items before placing an order.");
         return;
       }
-      const newOrder = {
-        id: Date.now().toString(), // Simple unique ID
-        orderTime: new Date().toISOString(),
-        items: currentCart, // Use the snapshot of the cart
-        totalAmountCents: totalCents, // Save the calculated total
-      };
-      console.log("New order created:", newOrder);
 
-      addOrder(newOrder);
-      resetCart();
-      console.log("Redirecting to orders.html");
-      window.location.href = "orders.html";
+      // The newOrder object is now just the cart items, as the backend calculates the total.
+      // The backend doesn't need the id or orderTime from the client.
+      const newOrder = {
+        items: currentCart
+      };
+      console.log("Order data to be sent:", newOrder);
+
+      const result = await addOrder(newOrder);
+
+      if (result) {
+        // Only reset cart and redirect if the order was placed successfully.
+        resetCart();
+        console.log("Redirecting to orders.html");
+        window.location.href = "orders.html";
+      }
+      // If result is null, addOrder already showed an alert.
     });
   } else {
     console.error(
