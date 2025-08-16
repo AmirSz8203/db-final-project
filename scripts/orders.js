@@ -1,6 +1,8 @@
 import { formatCurrency } from './utils/money.js';
 import dayjs from "https://unpkg.com/dayjs@1.11.10/esm/index.js";
 
+const API_BASE_URL = 'http://localhost:8000';
+
 async function fetchOrders() {
     const token = localStorage.getItem('accessToken');
     if (!token) {
@@ -10,7 +12,7 @@ async function fetchOrders() {
     }
 
     try {
-        const response = await fetch('/orders', {
+        const response = await fetch(`${API_BASE_URL}/orders`, {
             headers: { 'Authorization': `Bearer ${token}` }
         });
 
@@ -96,7 +98,7 @@ async function renderOrders(orders) {
 
 async function getProduct(productId) {
     try {
-        const response = await fetch(`/products/${productId}`);
+        const response = await fetch(`${API_BASE_URL}/products/${productId}`);
         if (response.ok) {
             return await response.json();
         }
