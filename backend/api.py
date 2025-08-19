@@ -73,6 +73,7 @@ class OrderItem(BaseModel):
     product_id: str
     quantity: int
     price_cents: int
+    delivery_option_id: str
 
 class OrderCreate(BaseModel):
     items: list[OrderItem]
@@ -165,8 +166,8 @@ def create_order(order: OrderCreate, current_user: User = Depends(get_current_us
 
     for item in order.items:
         cursor.execute(
-            "INSERT INTO order_items (order_id, product_id, quantity, price_cents) VALUES (?, ?, ?, ?)",
-            (order_id, item.product_id, item.quantity, item.price_cents)
+            "INSERT INTO order_items (order_id, product_id, quantity, price_cents, delivery_option_id) VALUES (?, ?, ?, ?, ?)",
+            (order_id, item.product_id, item.quantity, item.price_cents, item.delivery_option_id)
         )
 
     db.commit()

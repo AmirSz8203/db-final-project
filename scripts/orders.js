@@ -1,5 +1,7 @@
 import { formatCurrency } from './utils/money.js';
 import dayjs from "https://unpkg.com/dayjs@1.11.10/esm/index.js";
+import { calculateCartQuantity } from '../../data/cart.js';
+import { getDeliveryOption, calculateDeliveryDate } from '../../data/deliveryOptions.js';
 
 const API_BASE_URL = 'http://localhost:8000';
 
@@ -66,13 +68,16 @@ async function renderOrders(orders) {
             const product = await getProduct(item.product_id);
             if (!product) continue;
 
+            const deliveryOption = getDeliveryOption(item.delivery_option_id);
+            const arrivalDate = calculateDeliveryDate(deliveryOption, order.order_date);
+
             ordersHTML += `
                 <div class="product-image-container">
                     <img src="${product.image}">
                 </div>
                 <div class="product-details">
                     <div class="product-name">${product.name}</div>
-                    <div class="product-delivery-date">Arriving on: Not implemented</div>
+                    <div class="product-delivery-date">Arriving on: ${arrivalDate}</div>
                     <div class="product-quantity">Quantity: ${item.quantity}</div>
                     <button class="buy-again-button button-primary">
                         <img class="buy-again-icon" src="images/icons/buy-again.png">
@@ -109,4 +114,15 @@ async function getProduct(productId) {
     }
 }
 
-document.addEventListener('DOMContentLoaded', fetchOrders);
+function updateCartQuantityDisplay() {
+    const cartQuantity = calculateCartQuantity();
+    const cartQuantityElement = document.querySelector(".js-cart-quantity");
+    if (cartQuantityElement) {
+      cartQuantityElement.innerHTML = cartQuantity > 0 ? cartQuantity : 0;
+    }
+}
+
+document.addEventListener('DOMContentLoaded', () => {
+    fetchOrders();
+    updateCartQuantityDisplay();
+});

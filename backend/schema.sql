@@ -37,5 +37,6 @@ CREATE TABLE IF NOT EXISTS order_items (
   order_id    INTEGER NOT NULL REFERENCES orders(id) ON DELETE CASCADE,
   product_id  TEXT NOT NULL REFERENCES products(id),
   quantity    INTEGER NOT NULL,
-  price_cents INTEGER NOT NULL
+  price_cents INTEGER NOT NULL,
+  delivery_option_id TEXT NOT NULL
 );
