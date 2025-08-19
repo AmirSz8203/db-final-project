@@ -22,7 +22,8 @@ export async function addOrder(order) {
       return {
         product_id: item.productId,
         quantity: item.quantity,
-        price_cents: priceCents
+        price_cents: priceCents,
+        delivery_option_id: item.deliveryOptionId
       };
     })
   };
