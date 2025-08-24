@@ -16,6 +16,7 @@ with open(JSON_PATH, encoding="utf-8") as f:
 # 2. Connect & create tables
 conn = sqlite3.connect(DB_PATH)
 cur  = conn.cursor()
+cur.execute("PRAGMA foreign_keys = ON;")
 cur.executescript(open(SCHEMA_PATH).read())
 
 # 3. Insert data
