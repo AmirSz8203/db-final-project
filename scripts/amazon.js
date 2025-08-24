@@ -1,7 +1,7 @@
-import { cart, addToCart, calculateCartQuantity } from "../data/cart.js";
+import { addToCart, calculateCartQuantity } from "../data/cart.js";
 
 let products = [];
-const API_BASE_URL = 'http://localhost:8000';
+const API_BASE_URL = "http://localhost:8000";
 
 const productsGridElement = document.querySelector(".js-products-grid");
 const searchBarElement = document.querySelector(".search-bar");
@@ -19,7 +19,8 @@ async function fetchProducts() {
     console.error("Could not fetch products:", error);
     const productsGridElement = document.querySelector(".js-products-grid");
     if (productsGridElement) {
-      productsGridElement.innerHTML = '<p class="error-message">Could not load products. Please try again later.</p>';
+      productsGridElement.innerHTML =
+        '<p class="error-message">Could not load products. Please try again later.</p>';
     }
   }
 }
@@ -119,14 +120,6 @@ function updateCartQuantityDisplay() {
 // Function to attach listeners to all .js-add-to-cart buttons
 function attachAddToCartListeners() {
   document.querySelectorAll(".js-add-to-cart").forEach((button) => {
-    // To prevent adding multiple listeners to the same button if this function is called multiple times,
-    // we can either remove old listeners or use a flag. A simpler way for now is to rely on the fact that
-    // innerHTML replacement clears old listeners on the child elements.
-    // However, if buttons are not re-rendered but only their container, this might be an issue.
-    // For full re-render of productsHTML, this is fine.
-    let addedMessageTimeoutId; // This needs to be managed per button, ideally store on the element or a map.
-    // For simplicity, this shared var will cause minor glitches if multiple buttons clicked fast.
-
     button.addEventListener("click", () => {
       const { productId } = button.dataset;
       const quantitySelector = document.querySelector(
@@ -142,8 +135,6 @@ function attachAddToCartListeners() {
       if (addedMessage) {
         addedMessage.classList.add("added-to-cart-visible");
 
-        // Clear previous timeout for this specific message if one exists
-        // This simple timeout management might still not be perfect for rapidly clicked different buttons.
         const existingTimeoutId = Number(addedMessage.dataset.timeoutId);
         if (existingTimeoutId) {
           clearTimeout(existingTimeoutId);

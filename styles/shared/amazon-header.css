@@ -27,7 +27,10 @@
 }
 
 .header-link {
-  display: inline-block;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
   padding: 6px;
   border-radius: 2px;
   cursor: pointer;
@@ -142,9 +145,13 @@
   font-weight: 700;
 
   position: absolute;
-  top: 4px;
+  top: 10px;
   left: 22px;
 
   width: 26px;
   text-align: center;
+}
+
+.login-icon {
+  width: 40px;
 }

@@ -42,9 +42,14 @@
       </div>
 
       <div class="amazon-header-right-section">
-        <a class="orders-link header-link" href="login.html" id="auth-link">
-          <span class="returns-text" id="auth-line1">Hello, sign in</span>
-          <span class="orders-text" id="auth-line2">Account & Lists</span>
+        <a
+          class="orders-link header-link login-link"
+          href="login.html"
+          id="auth-link"
+        >
+          <img class="login-icon" src="images/icons/login.png" />
+          <span class="returns-text" id="auth-line1">Sign in</span>
+          <span class="orders-text" id="auth-line2"></span>
         </a>
 
         <a class="orders-link header-link" href="orders.html">
@@ -55,7 +60,6 @@
         <a class="cart-link header-link" href="checkout.html">
           <img class="cart-icon" src="images/icons/cart-icon.png" />
           <div class="cart-quantity js-cart-quantity"></div>
-          <div class="cart-text">Cart</div>
         </a>
       </div>
     </div>
@@ -66,42 +70,45 @@
 
     <script type="module" src="./scripts/amazon.js"></script>
     <script>
-      document.addEventListener('DOMContentLoaded', async () => {
-        const API_BASE_URL = 'http://localhost:8000';
-        const token = localStorage.getItem('accessToken');
-        const authLink = document.getElementById('auth-link');
-        const authLine1 = document.getElementById('auth-line1');
-        const authLine2 = document.getElementById('auth-line2');
+      document.addEventListener("DOMContentLoaded", async () => {
+        const API_BASE_URL = "http://localhost:8000";
+        const token = localStorage.getItem("accessToken");
+        const authLink = document.getElementById("auth-link");
+        const authLine1 = document.getElementById("auth-line1");
 
         if (token) {
           try {
             const response = await fetch(`${API_BASE_URL}/users/me`, {
-              headers: { 'Authorization': `Bearer ${token}` }
+              headers: { Authorization: `Bearer ${token}` },
             });
 
             if (response.ok) {
               const user = await response.json();
-              authLine1.textContent = `Hello, ${user.username}`;
-              authLine2.textContent = 'Account & Lists';
-              authLink.href = '#'; // Or a profile page
-              authLink.addEventListener('click', (e) => {
+              authLine1.textContent = `${user.username}`;
+              authLink.href = "#"; // Or a profile page
+              authLink.addEventListener("click", (e) => {
                 e.preventDefault();
-                if (confirm('Are you sure you want to log out?')) {
-                  localStorage.removeItem('accessToken');
-                  window.location.href = 'login.html';
+                if (confirm("Are you sure you want to log out?")) {
+                  localStorage.removeItem("accessToken");
+                  window.location.href = "login.html";
                 }
               });
 
               // Change "Account & Lists" to "Logout" on hover
-              authLink.addEventListener('mouseover', () => authLine2.textContent = 'Logout?');
-              authLink.addEventListener('mouseout', () => authLine2.textContent = 'Account & Lists');
-
+              authLink.addEventListener(
+                "mouseover",
+                () => (authLine1.textContent = "Logout?")
+              );
+              authLink.addEventListener(
+                "mouseout",
+                () => (authLine1.textContent = `${user.username}`)
+              );
             } else {
-              localStorage.removeItem('accessToken'); // Invalid token
+              localStorage.removeItem("accessToken"); // Invalid token
             }
           } catch (error) {
-            console.error('Error fetching user data:', error);
-            localStorage.removeItem('accessToken');
+            console.error("Error fetching user data:", error);
+            localStorage.removeItem("accessToken");
           }
         }
       });

@@ -1,58 +1,65 @@
-import { formatCurrency } from './utils/money.js';
+import { formatCurrency } from "./utils/money.js";
 import dayjs from "https://unpkg.com/dayjs@1.11.10/esm/index.js";
-import { calculateCartQuantity } from '../../data/cart.js';
-import { getDeliveryOption, calculateDeliveryDate } from '../../data/deliveryOptions.js';
+import { calculateCartQuantity } from "../../data/cart.js";
+import {
+  getDeliveryOption,
+  calculateDeliveryDate,
+} from "../../data/deliveryOptions.js";
 
-const API_BASE_URL = 'http://localhost:8000';
+const API_BASE_URL = "http://localhost:8000";
 
 async function fetchOrders() {
-    const token = localStorage.getItem('accessToken');
-    if (!token) {
-        // Already handled by the inline script in orders.html, but as a fallback
-        window.location.href = 'login.html';
-        return;
-    }
+  const token = localStorage.getItem("accessToken");
+  if (!token) {
+    // Already handled by the inline script in orders.html, but as a fallback
+    window.location.href = "login.html";
+    return;
+  }
 
-    try {
-        const response = await fetch(`${API_BASE_URL}/orders`, {
-            headers: { 'Authorization': `Bearer ${token}` }
-        });
+  try {
+    const response = await fetch(`${API_BASE_URL}/orders`, {
+      headers: { Authorization: `Bearer ${token}` },
+    });
 
-        if (response.ok) {
-            const orders = await response.json();
-            renderOrders(orders);
-        } else {
-            console.error('Failed to fetch orders');
-            document.querySelector('.orders-grid').innerHTML = '<p>Could not load your orders.</p>';
-        }
-    } catch (error) {
-        console.error('Error fetching orders:', error);
-        document.querySelector('.orders-grid').innerHTML = '<p>An error occurred while loading your orders.</p>';
+    if (response.ok) {
+      const orders = await response.json();
+      renderOrders(orders);
+    } else {
+      console.error("Failed to fetch orders");
+      document.querySelector(".orders-grid").innerHTML =
+        "<p>Could not load your orders.</p>";
     }
+  } catch (error) {
+    console.error("Error fetching orders:", error);
+    document.querySelector(".orders-grid").innerHTML =
+      "<p>An error occurred while loading your orders.</p>";
+  }
 }
 
 async function renderOrders(orders) {
-    const ordersGrid = document.querySelector('.orders-grid');
-    if (orders.length === 0) {
-        ordersGrid.innerHTML = '<p>You have no past orders.</p>';
-        return;
-    }
+  const ordersGrid = document.querySelector(".orders-grid");
+  if (orders.length === 0) {
+    ordersGrid.innerHTML = "<p>You have no past orders.</p>";
+    return;
+  }
 
-    let ordersHTML = '';
-    for (const order of orders) {
-        const orderTime = dayjs(order.order_date);
+  let ordersHTML = "";
+  for (const order of orders) {
+    const orderTime = dayjs(order.order_date);
 
-        ordersHTML += `
+    ordersHTML += `
             <div class="order-container">
                 <div class="order-header">
                     <div class="order-header-left-section">
                         <div class="order-date">
                             <div class="order-header-label">Order Placed:</div>
-                            <div>${orderTime.format('MMMM D, YYYY')}</div>
+                            <div>${orderTime.format("MMMM D, YYYY")}</div>
                         </div>
                         <div class="order-total">
                             <div class="order-header-label">Total:</div>
-                            <div>$${formatCurrency(order.total_price_cents)}</div>
+                            <div>$${formatCurrency(
+                              order.total_price_cents
+                            )}</div>
                         </div>
                     </div>
                     <div class="order-header-right-section">
@@ -63,15 +70,18 @@ async function renderOrders(orders) {
                 <div class="order-details-grid">
         `;
 
-        for (const item of order.items) {
-            // We need to fetch product details for each item
-            const product = await getProduct(item.product_id);
-            if (!product) continue;
+    for (const item of order.items) {
+      // We need to fetch product details for each item
+      const product = await getProduct(item.product_id);
+      if (!product) continue;
 
-            const deliveryOption = getDeliveryOption(item.delivery_option_id);
-            const arrivalDate = calculateDeliveryDate(deliveryOption, order.order_date);
+      const deliveryOption = getDeliveryOption(item.delivery_option_id);
+      const arrivalDate = calculateDeliveryDate(
+        deliveryOption,
+        order.order_date
+      );
 
-            ordersHTML += `
+      ordersHTML += `
                 <div class="product-image-container">
                     <img src="${product.image}">
                 </div>
@@ -90,39 +100,39 @@ async function renderOrders(orders) {
                     </a>
                 </div>
             `;
-        }
+    }
 
-        ordersHTML += `
+    ordersHTML += `
                 </div>
             </div>
         `;
-    }
+  }
 
-    ordersGrid.innerHTML = ordersHTML;
+  ordersGrid.innerHTML = ordersHTML;
 }
 
 async function getProduct(productId) {
-    try {
-        const response = await fetch(`${API_BASE_URL}/products/${productId}`);
-        if (response.ok) {
-            return await response.json();
-        }
-        return null;
-    } catch (error) {
-        console.error(`Error fetching product ${productId}:`, error);
-        return null;
+  try {
+    const response = await fetch(`${API_BASE_URL}/products/${productId}`);
+    if (response.ok) {
+      return await response.json();
     }
+    return null;
+  } catch (error) {
+    console.error(`Error fetching product ${productId}:`, error);
+    return null;
+  }
 }
 
 function updateCartQuantityDisplay() {
-    const cartQuantity = calculateCartQuantity();
-    const cartQuantityElement = document.querySelector(".js-cart-quantity");
-    if (cartQuantityElement) {
-      cartQuantityElement.innerHTML = cartQuantity > 0 ? cartQuantity : 0;
-    }
+  const cartQuantity = calculateCartQuantity();
+  const cartQuantityElement = document.querySelector(".js-cart-quantity");
+  if (cartQuantityElement) {
+    cartQuantityElement.innerHTML = cartQuantity > 0 ? cartQuantity : 0;
+  }
 }
 
-document.addEventListener('DOMContentLoaded', () => {
-    fetchOrders();
-    updateCartQuantityDisplay();
+document.addEventListener("DOMContentLoaded", () => {
+  fetchOrders();
+  updateCartQuantityDisplay();
 });
