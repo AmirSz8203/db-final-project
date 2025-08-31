@@ -51,7 +51,7 @@ def get_db():
     finally:
         conn.close()
 
-# --- Pydantic Models ---
+# Pydantic Models
 class User(BaseModel):
     username: str
     email: str
@@ -79,7 +79,7 @@ class OrderItem(BaseModel):
 class OrderCreate(BaseModel):
     items: list[OrderItem]
 
-# --- JWT Authentication ---
+# JWT Authentication
 oauth2_scheme = OAuth2PasswordBearer(tokenUrl="token")
 
 def create_access_token(data: dict, expires_delta: timedelta | None = None):
