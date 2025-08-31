@@ -191,14 +191,30 @@ def get_orders(current_user: User = Depends(get_current_user), db: sqlite3.Conne
 
 @app.get("/products")
 def list_products(skip: int = 0, limit: int = 20, db=Depends(get_db)):
-    rows = db.execute(
-        "SELECT * FROM products ORDER BY id LIMIT ? OFFSET ?", (limit, skip)
-    ).fetchall()
+    query = """
+        SELECT
+            p.id,
+            p.name,
+            p.image_path,
+            p.price_cents,
+            p.discount_pct,
+            r.stars AS rating_stars,
+            r.count AS rating_count
+        FROM products p
+        JOIN ratings r ON p.id = r.product_id
+        ORDER BY p.id
+        LIMIT ? OFFSET ?
+    """
+    rows = db.execute(query, (limit, skip)).fetchall()
+
     out = []
     for r in rows:
-        kws = [k["keyword"] for k in db.execute(
-            "SELECT keyword FROM product_keywords WHERE product_id = ?", (r["id"],)
-        ).fetchall()]
+        kws_query = """
+            SELECT k.name FROM keywords k
+            JOIN product_keyword_map pkm ON k.id = pkm.keyword_id
+            WHERE pkm.product_id = ?
+        """
+        kws = [k["name"] for k in db.execute(kws_query, (r["id"],)).fetchall()]
         out.append({
           "id": r["id"],
           "name": r["name"],
@@ -212,14 +228,30 @@ def list_products(skip: int = 0, limit: int = 20, db=Depends(get_db)):
 
 @app.get("/products/{pid}")
 def get_product(pid: str, db=Depends(get_db)):
-    r = db.execute(
-        "SELECT * FROM products WHERE id = ?", (pid,)
-    ).fetchone()
+    query = """
+        SELECT
+            p.id,
+            p.name,
+            p.image_path,
+            p.price_cents,
+            p.discount_pct,
+            r.stars AS rating_stars,
+            r.count AS rating_count
+        FROM products p
+        JOIN ratings r ON p.id = r.product_id
+        WHERE p.id = ?
+    """
+    r = db.execute(query, (pid,)).fetchone()
     if not r:
         raise HTTPException(404, "Not found")
-    kws = [k["keyword"] for k in db.execute(
-        "SELECT keyword FROM product_keywords WHERE product_id = ?", (pid,)
-    ).fetchall()]
+
+    kws_query = """
+        SELECT k.name FROM keywords k
+        JOIN product_keyword_map pkm ON k.id = pkm.keyword_id
+        WHERE pkm.product_id = ?
+    """
+    kws = [k["name"] for k in db.execute(kws_query, (pid,)).fetchall()]
+
     return {
       "id": r["id"],
       "name": r["name"],
