@@ -9,7 +9,7 @@ backend/__pycache__/
 backend/myshop.db
 
 # Log files
-uvicorn.log
+*.log
 
 # OS-specific files
 .DS_Store

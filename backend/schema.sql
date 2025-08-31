@@ -5,16 +5,25 @@ CREATE TABLE IF NOT EXISTS products (
   name         TEXT NOT NULL,
   image_path   TEXT,
   price_cents  INTEGER NOT NULL,
-  discount_pct INTEGER,
-  rating_stars INTEGER,
-  rating_count INTEGER
+  discount_pct INTEGER
 );
 
-CREATE TABLE IF NOT EXISTS product_keywords (
-  product_id TEXT
-    REFERENCES products(id) ON DELETE CASCADE,
-  keyword    TEXT,
-  PRIMARY KEY (product_id, keyword)
+CREATE TABLE IF NOT EXISTS ratings (
+  id           INTEGER PRIMARY KEY AUTOINCREMENT,
+  product_id   TEXT UNIQUE NOT NULL REFERENCES products(id) ON DELETE CASCADE,
+  stars        INTEGER NOT NULL,
+  count        INTEGER NOT NULL
+);
+
+CREATE TABLE IF NOT EXISTS keywords (
+  id   INTEGER PRIMARY KEY AUTOINCREMENT,
+  name TEXT UNIQUE NOT NULL
+);
+
+CREATE TABLE IF NOT EXISTS product_keyword_map (
+  product_id TEXT NOT NULL REFERENCES products(id) ON DELETE CASCADE,
+  keyword_id INTEGER NOT NULL REFERENCES keywords(id) ON DELETE CASCADE,
+  PRIMARY KEY (product_id, keyword_id)
 );
 
 CREATE TABLE IF NOT EXISTS users (
