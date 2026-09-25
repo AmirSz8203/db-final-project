@@ -24,23 +24,24 @@ A full-stack clone of the Amazon shopping experience, built as a final project f
 - `uvicorn` as the ASGI server
 
 ## 📁 Project Structure
-
+```
 db-final-project/
-├── amazon.html # Home / product listing page
-├── checkout.html # Checkout page
-├── login.html # Login / signup page
-├── orders.html # Order history page
-├── tracking.html # Order tracking page
+├── amazon.html          # Home / product listing page
+├── checkout.html        # Checkout page
+├── login.html           # Login / signup page
+├── orders.html          # Order history page
+├── tracking.html        # Order tracking page
 ├── backend/
-│ ├── api.py # FastAPI app & all endpoints
-│ ├── load_data.py # Seeds SQLite DB from products.json
-│ ├── products.json # Raw product data
-│ ├── schema.sql # Database schema
-│ └── requirements.txt
-├── data/ # Frontend data helpers (cart, orders, etc.)
-├── scripts/ # Frontend JS logic per page
-├── styles/ # Shared & page-specific CSS
-└── images/ # Product & UI images
+│   ├── api.py            # FastAPI app & all endpoints
+│   ├── load_data.py      # Seeds SQLite DB from products.json
+│   ├── products.json     # Raw product data
+│   ├── schema.sql        # Database schema
+│   └── requirements.txt
+├── data/                 # Frontend data helpers (cart, orders, etc.)
+├── scripts/              # Frontend JS logic per page
+├── styles/                # Shared & page-specific CSS
+└── images/                # Product & UI images
+```
 
 ## 🗄️ Database Schema
 
