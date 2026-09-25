@@ -95,4 +95,10 @@ Then open `amazon.html` in the browser.
 
 ## 👤 Author
 
-Built by [Amir](https://github.com/AmirSz8203) as a database course final project.
+Built by [Amir Safarzadeh](https://github.com/AmirSz8203) as a database course final project.
+
+## 📄 License
+
+This project is licensed under the MIT License — see the [LICENSE](LICENSE) file for details.
+
+> **Note:** This is an educational project built for a database course. The Amazon branding and product imagery are used for learning purposes only and are not affiliated with or endorsed by Amazon.
