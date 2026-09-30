@@ -58,7 +58,7 @@ async function renderOrders(orders) {
                         <div class="order-total">
                             <div class="order-header-label">Total:</div>
                             <div>$${formatCurrency(
-                              order.total_price_cents
+                              order.total_price_cents,
                             )}</div>
                         </div>
                     </div>
@@ -78,7 +78,7 @@ async function renderOrders(orders) {
       const deliveryOption = getDeliveryOption(item.delivery_option_id);
       const arrivalDate = calculateDeliveryDate(
         deliveryOption,
-        order.order_date
+        order.order_date,
       );
 
       ordersHTML += `
@@ -89,10 +89,6 @@ async function renderOrders(orders) {
                     <div class="product-name">${product.name}</div>
                     <div class="product-delivery-date">Arriving on: ${arrivalDate}</div>
                     <div class="product-quantity">Quantity: ${item.quantity}</div>
-                    <button class="buy-again-button button-primary">
-                        <img class="buy-again-icon" src="images/icons/buy-again.png">
-                        <span class="buy-again-message">Buy it again</span>
-                    </button>
                 </div>
                 <div class="product-actions">
                     <a href="tracking.html?orderId=${order.id}&productId=${product.id}">
