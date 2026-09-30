@@ -6,7 +6,7 @@ import {
   calculateDeliveryDate,
 } from "../../data/deliveryOptions.js";
 
-const API_BASE_URL = "http://localhost:8000";
+const API_BASE_URL = "http://localhost:8001";
 
 async function fetchOrders() {
   const token = localStorage.getItem("accessToken");

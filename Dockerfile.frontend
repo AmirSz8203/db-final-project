@@ -1,0 +1,6 @@
+FROM nginx:alpine
+COPY amazon.html checkout.html login.html orders.html tracking.html /usr/share/nginx/html/
+COPY scripts/ /usr/share/nginx/html/scripts/
+COPY styles/  /usr/share/nginx/html/styles/
+COPY data/    /usr/share/nginx/html/data/
+COPY images/  /usr/share/nginx/html/images/

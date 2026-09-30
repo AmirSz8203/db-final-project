@@ -1,7 +1,7 @@
 import { addToCart, calculateCartQuantity } from "../data/cart.js";
 
 let products = [];
-const API_BASE_URL = "http://localhost:8000";
+const API_BASE_URL = "http://localhost:8001";
 
 const productsGridElement = document.querySelector(".js-products-grid");
 const searchBarElement = document.querySelector(".search-bar");
@@ -9,7 +9,7 @@ const searchButtonElement = document.querySelector(".search-button");
 
 async function fetchProducts() {
   try {
-    const response = await fetch(`${API_BASE_URL}/products`);
+    const response = await fetch(`${API_BASE_URL}/products?limit=100`);
     if (!response.ok) {
       throw new Error(`HTTP error! status: ${response.status}`);
     }
@@ -38,7 +38,7 @@ function renderProductsGrid(productsToDisplay) {
 
       if (product.discountPercent && product.discountPercent > 0) {
         const discountAmount = Math.round(
-          product.priceCents * (product.discountPercent / 100)
+          product.priceCents * (product.discountPercent / 100),
         );
         const discountedPriceCents = product.priceCents - discountAmount;
 
@@ -123,14 +123,14 @@ function attachAddToCartListeners() {
     button.addEventListener("click", () => {
       const { productId } = button.dataset;
       const quantitySelector = document.querySelector(
-        `.js-quantity-selector-${productId}`
+        `.js-quantity-selector-${productId}`,
       );
       const quantity = Number(quantitySelector.value);
       addToCart(productId, quantity); // addToCart now handles getting the correct price
       updateCartQuantityDisplay();
 
       const addedMessage = document.querySelector(
-        `.js-added-to-cart-${productId}`
+        `.js-added-to-cart-${productId}`,
       );
       if (addedMessage) {
         addedMessage.classList.add("added-to-cart-visible");
@@ -157,7 +157,7 @@ function performSearch() {
     const filteredProducts = products.filter((product) => {
       const nameMatch = product.name.toLowerCase().includes(searchTerm);
       const keywordMatch = product.keywords.some((keyword) =>
-        keyword.toLowerCase().includes(searchTerm)
+        keyword.toLowerCase().includes(searchTerm),
       );
       return nameMatch || keywordMatch;
     });
@@ -170,7 +170,7 @@ if (productsGridElement) {
   fetchProducts(); // Fetch products from backend and then render
 } else {
   console.warn(
-    ".js-products-grid not found on this page. Skipping product rendering."
+    ".js-products-grid not found on this page. Skipping product rendering.",
   );
 }
 
@@ -178,7 +178,7 @@ if (searchButtonElement) {
   searchButtonElement.addEventListener("click", performSearch);
 } else {
   console.warn(
-    ".search-button not found on this page. Search will not work via button."
+    ".search-button not found on this page. Search will not work via button.",
   );
 }
 
@@ -192,7 +192,7 @@ if (searchBarElement) {
   // searchBarElement.addEventListener("input", performSearch);
 } else {
   console.warn(
-    ".search-bar not found on this page. Search will not work via input."
+    ".search-bar not found on this page. Search will not work via input.",
   );
 }
 

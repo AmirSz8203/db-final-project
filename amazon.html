@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+<!doctype html>
 <html>
   <head>
     <title>Amazon Project</title>
@@ -71,14 +71,14 @@
     <script type="module" src="./scripts/amazon.js"></script>
     <script>
       document.addEventListener("DOMContentLoaded", async () => {
-        const API_BASE_URL = "http://localhost:8000";
+        const API_BASE_URL = "http://localhost:8001";
         const token = localStorage.getItem("accessToken");
         const authLink = document.getElementById("auth-link");
         const authLine1 = document.getElementById("auth-line1");
 
         if (token) {
           try {
-            const response = await fetch(`${API_BASE_URL}/users/me`, {
+            const response = await fetch(`${API_BASE_URL}/users/me/`, {
               headers: { Authorization: `Bearer ${token}` },
             });
 
@@ -97,11 +97,11 @@
               // Change "Account & Lists" to "Logout" on hover
               authLink.addEventListener(
                 "mouseover",
-                () => (authLine1.textContent = "Logout?")
+                () => (authLine1.textContent = "Logout?"),
               );
               authLink.addEventListener(
                 "mouseout",
-                () => (authLine1.textContent = `${user.username}`)
+                () => (authLine1.textContent = `${user.username}`),
               );
             } else {
               localStorage.removeItem("accessToken"); // Invalid token

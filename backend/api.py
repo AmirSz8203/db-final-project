@@ -13,9 +13,9 @@ import os
 
 # --- Configuration ---
 BASE_DIR = os.path.dirname(__file__)
-DB_PATH = os.path.join(BASE_DIR, "myshop.db")
+DB_PATH = os.environ.get("DB_PATH", os.path.join(BASE_DIR, "myshop.db"))
+SECRET_KEY = os.environ.get("SECRET_KEY", "dev-only-insecure-key")
 IM_DIR = os.path.join(BASE_DIR, "..", "images")
-SECRET_KEY = "a_very_secret_key"  # In a real app, use a more secure key and load from environment
 ALGORITHM = "HS256"
 ACCESS_TOKEN_EXPIRE_MINUTES = 30
 
@@ -23,6 +23,8 @@ ACCESS_TOKEN_EXPIRE_MINUTES = 30
 app = FastAPI()
 
 origins = [
+    "http://localhost:8080",
+    "http://127.0.0.1:8080",
     "http://127.0.0.1:5501",
     "http://localhost:5501",
     "null",

@@ -1,0 +1,6 @@
+.git
+**/__pycache__
+backend/myshop.db
+backend/venv
+.env
+*.md
