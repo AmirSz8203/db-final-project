@@ -1,5 +1,5 @@
 document.addEventListener("DOMContentLoaded", () => {
-  const API_BASE_URL = "http://localhost:8000";
+  const API_BASE_URL = "http://localhost:8001";
 
   const loginContainer = document.getElementById("login-container");
   const signupContainer = document.getElementById("signup-container");

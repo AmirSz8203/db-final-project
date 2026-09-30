@@ -5,7 +5,7 @@ import sqlite3
 import os
 
 BASE_DIR    = os.path.dirname(__file__)
-DB_PATH     = os.path.join(BASE_DIR, "myshop.db")
+DB_PATH = os.environ.get("DB_PATH", os.path.join(BASE_DIR, "myshop.db"))
 SCHEMA_PATH = os.path.join(BASE_DIR, "schema.sql")
 JSON_PATH   = os.path.join(BASE_DIR, "products.json")
 

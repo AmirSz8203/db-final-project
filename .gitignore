@@ -13,3 +13,5 @@ backend/myshop.db
 
 # OS-specific files
 .DS_Store
+
+.env
