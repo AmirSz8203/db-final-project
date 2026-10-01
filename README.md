@@ -10,6 +10,7 @@ A full-stack clone of the Amazon shopping experience, built as a final project f
 - 📦 Order history and shipment tracking
 - 🗄️ Normalized relational schema for products, ratings, keywords, users, and orders
 - 🐳 Dockerized backend and frontend, with the database persisted in a volume
+- 🧪 Selenium end-to-end tests covering auth, cart, and checkout flows
 
 ## 🧱 Tech Stack
 
@@ -23,6 +24,9 @@ A full-stack clone of the Amazon shopping experience, built as a final project f
 - SQLite (via Python's `sqlite3`)
 - `python-jose` for JWT auth
 - `passlib[bcrypt]` for password hashing
+
+**Testing**
+- [Selenium](https://www.selenium.dev/) + `pytest` for end-to-end browser tests
 
 **Infrastructure**
 - Docker & Docker Compose
@@ -45,12 +49,14 @@ db-final-project/
 │   ├── Dockerfile         # Backend image
 │   └── entrypoint.sh      # Seeds the DB on first start, then runs uvicorn
 ├── data/                  # Frontend data helpers (cart, orders, products, delivery options)
-├── scripts/               # Frontend JS logic per page
-├── styles/                # Shared & page-specific CSS
-├── images/                # Product & UI images
-├── Dockerfile.frontend    # nginx image for the static frontend
-├── docker-compose.yml     # Runs backend + frontend
-└── .env                   # Secrets (not committed)
+├── scripts/                # Frontend JS logic per page
+├── styles/                 # Shared & page-specific CSS
+├── images/                 # Product & UI images
+├── conftest.py             # Pytest fixtures for the Selenium test suite
+├── test_e2e.py              # Selenium end-to-end tests
+├── Dockerfile.frontend     # nginx image for the static frontend
+├── docker-compose.yml      # Runs backend + frontend
+└── .env                    # Secrets (not committed)
 ```
 
 ## 🗄️ Database Schema
@@ -156,6 +162,33 @@ Interactive documentation is generated automatically at `/docs` (Swagger UI) and
 | GET    | `/orders`         | Yes  | Get the current user's orders        |
 
 `/products` returns 20 items by default. The frontend requests `/products?limit=100` to load the full catalog.
+
+## 🧪 Testing
+
+End-to-end tests drive a real browser with Selenium to exercise signup/login, product search, add-to-cart, the full checkout flow, and logout.
+
+**Prerequisites:** the stack must be running (`docker compose up`, or backend on `:8001` + frontend on `:8080`/`:5501` per Option B above), plus:
+
+```bash
+pip install selenium pytest webdriver-manager
+```
+
+Run the suite:
+
+```bash
+pytest test_e2e.py -v
+```
+
+Covered scenarios (`test_e2e.py`):
+
+- `test_signup_then_login` — signup followed by a successful login
+- `test_login_with_wrong_password_shows_error` — invalid credentials are rejected
+- `test_search_filters_products` — search narrows the product grid
+- `test_add_to_cart_updates_quantity_badge` — adding a product updates the cart badge
+- `test_full_purchase_flow` — signup → login → add to cart → checkout → place order → order appears in order history
+- `test_logout_redirects_to_login` — logging out clears the session and redirects to the login page
+
+> ⚠️ These tests write real users and orders to the database. Run them against a disposable/test database, not production data — `docker compose down -v` resets it afterward.
 
 ## 🔒 Configuration
 
