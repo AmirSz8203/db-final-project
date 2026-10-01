@@ -15,3 +15,5 @@ backend/myshop.db
 .DS_Store
 
 .env
+
+.venv
